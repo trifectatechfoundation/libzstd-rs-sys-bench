@@ -1,0 +1,30 @@
+{
+    "name": "metrics",
+    "description": "Stores performance metrics for zlib-rs.",
+    "version": "1.0.0",
+    "devDependencies": {
+        "typescript": "^4.5.2",
+        "@types/plotly.js": "^1.54.16"
+    },
+    "scripts": {
+        "build": "./node_modules/typescript/bin/tsc -p tsconfig.json",
+        "start": "./node_modules/typescript/bin/tsc -p tsconfig.json --watch"
+    },
+    "license": "MIT OR Apache-2.0",
+    "bugs": {
+        "url": "https://github.com/trifectatechfoundation/zlib-rs-bench/issues"
+    },
+    "homepage": "https://github.com/trifectatechfoundation/zlib-rs-bench/tree/gh-pages#readme",
+    "prettier": {
+        "trailingComma": "es5",
+        "tabWidth": 4,
+        "semi": true,
+        "singleQuote": true
+    },
+    "main": "script.js",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/trifectatechfoundation/libzstd-rs-sys-bench.git"
+    },
+    "author": ""
+}

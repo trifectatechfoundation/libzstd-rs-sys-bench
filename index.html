@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>libzstd-rs-sys benchmark dashboard</title>
+  <script src="https://cdn.plot.ly/plotly-1.58.4.min.js"></script>
+  <link rel="stylesheet" href="./style.css">
+  <style>
+      /* Ensure the buttons are displayed horizontally */
+        #buttons {
+            display: flex;
+            gap: 10px; /* Add spacing between buttons */
+            width: 100%;  /* Ensure buttons take up available space */
+        }
+
+        /* Style for each radio button and its label */
+        #buttons label {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1;  /* Ensure each button takes equal width */
+            padding: 15px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            background-color: #f0f0f0;
+            cursor: pointer;
+            text-align: center;
+            font-weight: normal;
+            transition: all 0.3s ease;
+        }
+
+        /* Style for selected (checked) radio button */
+        input[type="radio"]:checked + span {
+            font-weight: bold;  /* Bold text for selected button */
+        }
+
+        /* Hover effect to make it look interactive */
+        #buttons label:hover {
+            background-color: #ddd;
+        }
+
+        /* Style for the radio input itself (invisible, so labels are clickable) */
+        input[type="radio"] {
+            display: none;
+        }
+  </style>
+</head>
+
+<body>
+  <div id="inner">
+    <h1>libzstd-rs-sys benchmark dashboard</h1>
+
+    <p>
+      <a href="https://github.com/trifectatechfoundation/libzstd-rs-sys-bench/tree/gh-pages">GitHub</a>
+    </p>
+
+    <div id="notification" class="notification hidden"></div>
+
+    <div id="buttons">
+        <label>
+            <input checked type="radio" name="target" value="linux-x86" onclick="update(this.value, 'task-clock')">
+            <span>linux-x86 / task-clock</span>
+        </label>
+        <label>
+            <input type="radio" name="target" value="linux-x86" onclick="update(this.value, 'cycles')">
+            <span>linux-x86 / cycles</span>
+        </label>
+        <label>
+            <input type="radio" name="target" value="linux-x86" onclick="update(this.value, 'instructions')">
+            <span>linux-x86 / instructions</span>
+        </label>
+        <label>
+            <input type="radio" name="target" value="macos-arm64" onclick="update(this.value, 'user-time')">
+            <span>macos-arm64 / user-time</span>
+        </label>
+    </div>
+    <div id="plots"></div>
+  </div>
+
+  <script src="./script.js"></script>
+</body>
+
+</html>
