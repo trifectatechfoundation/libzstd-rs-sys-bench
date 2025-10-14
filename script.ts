@@ -406,9 +406,9 @@ function render(data_url: string, entries: Root[], counter: CounterName) {
             "libzstd-rs-sys decompression",
             entries,
             "decompress-rs",
-            ["silesia-small.tar"],
+            ["silesia-small.tar.zst", "re2-exhaustive.txt.zst", "zip64support.tar.zst"],
             (cmd) => cmd[2],
-            (level) => `2^${level}`,
+            (level) => `${level}`,
             counter,
         );
         render_plot(plot);

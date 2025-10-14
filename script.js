@@ -301,7 +301,7 @@ function render(data_url, entries, counter) {
     }
     {
         console.log(entries);
-        const plot = results_over_time("libzstd-rs-sys decompression", entries, "decompress-rs", ["silesia-small.tar"], (cmd) => cmd[2], (level) => `2^${level}`, counter);
+        const plot = results_over_time("libzstd-rs-sys decompression", entries, "decompress-rs", ["silesia-small.tar.zst", "re2-exhaustive.txt.zst", "zip64support.tar.zst"], (cmd) => cmd[2], (level) => `${level}`, counter);
         render_plot(plot);
     }
 }
