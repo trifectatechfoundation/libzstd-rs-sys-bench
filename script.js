@@ -98,6 +98,9 @@ function results_over_time(title, lines, group, keys, get_key, key_to_name, coun
     let unzipped = {};
     for (let i in lines) {
         let line = lines[i];
+        if (!line.bench_groups[group]) {
+            continue;
+        }
         for (let run of line.bench_groups[group]) {
             const key = get_key(run.cmd);
             if (!unzipped[key]) {
@@ -277,31 +280,23 @@ function render(data_url, entries, counter) {
         const final = entries[entries.length - 1];
         const final_c = final.bench_groups["decompress-c"];
         const final_rs = final.bench_groups["decompress-rs"];
-        {
-            const final = entries[entries.length - 1];
-            const final_c = final.bench_groups["decompress-c"];
-            const final_rs = final.bench_groups["decompress-rs"];
-            const plot = compare_impls_barchart(`c versus rs (decompression, ${counter}, on <a href="https://github.com/trifectatechfoundation/libzstd-rs-sys/commit/${final.commit_hash}">main</a>)`, "zstd-rs", final_c, "libzstd-rs-sys", final_rs, "File", (cmd) => cmd[2].split("/").reverse()[0], counter);
-            render_plot(plot);
-        }
-        //        {
-        //            const plot = compare_impls(
-        //                `c versus rs (decompression, ${counter}, on <a href="https://github.com/trifectatechfoundation/libzstd-rs-sys/commit/${final.commit_hash}">main</a>)`,
-        //                "zstd-sys",
-        //                final_c,
-        //                "libzstd-rs-sys",
-        //                final_rs,
-        //                "Input Chunk Size (power of 2 bytes)",
-        //                (cmd) => parseFloat(cmd[2]),
-        //                counter,
-        //                [5, 16],
-        //            );
-        //            render_plot(plot);
-        //        }
+        const plot = compare_impls_barchart(`c versus rs (decompression, ${counter}, on <a href="https://github.com/trifectatechfoundation/libzstd-rs-sys/commit/${final.commit_hash}">main</a>)`, "zstd-rs", final_c, "libzstd-rs-sys", final_rs, "File", (cmd) => cmd[2].split("/").reverse()[0], counter);
+        render_plot(plot);
     }
     {
-        console.log(entries);
         const plot = results_over_time("libzstd-rs-sys decompression", entries, "decompress-rs", ["silesia-small.tar.zst", "re2-exhaustive.txt.zst", "zip64support.tar.zst"], (cmd) => cmd[2], (level) => `${level}`, counter);
+        render_plot(plot);
+    }
+    {
+        const final = entries[entries.length - 1];
+        const final_c = final.bench_groups["compress-c"];
+        const final_rs = final.bench_groups["compress-rs"];
+        const plot = compare_impls_barchart(`c versus rs (compression, ${counter}, on <a href="https://github.com/trifectatechfoundation/libzstd-rs-sys/commit/${final.commit_hash}">main</a>)`, "zstd-rs", final_c, "libzstd-rs-sys", final_rs, "File", (cmd) => `${cmd[3].split("/").reverse()[0]} (level ${cmd[2]})`, counter);
+        render_plot(plot);
+    }
+    {
+        const plot = results_over_time("libzstd-rs-sys compression", entries, "compress-rs", ["silesia-small.tar.zst", "re2-exhaustive.txt.zst", "zip64support.tar.zst"]
+            .flatMap((f) => [1, 3, 19].map((level) => `${f} (level ${level})`)), (cmd) => `${cmd[3]} (level ${cmd[2]})`, (level) => `${level}`, counter);
         render_plot(plot);
     }
 }

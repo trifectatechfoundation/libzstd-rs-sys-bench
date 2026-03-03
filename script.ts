@@ -3,24 +3,24 @@ type MemoryMetric = [number, 'MB'];
 type TimeMetric = [number, 'ms'];
 
 type Root = {
-  commit_hash: string
-  commit_timestamp: number
-  timestamp: Timestamp
-  arch: string
-  os: string
-  runner: string
-  cpu_model: string
-  bench_groups: {[key: string]: SingleBench[]},
+    commit_hash: string
+    commit_timestamp: number
+    timestamp: Timestamp
+    arch: string
+    os: string
+    runner: string
+    cpu_model: string
+    bench_groups: { [key: string]: SingleBench[] },
 };
 
 type Timestamp = {
-  secs_since_epoch: number
-  nanos_since_epoch: number
+    secs_since_epoch: number
+    nanos_since_epoch: number
 };
 
 type SingleBench = {
-  cmd: string[]
-  counters: Counters
+    cmd: string[]
+    counters: Counters
 };
 
 type CounterName = "cycles" | "instructions" | "user-time" | "task-clock";
@@ -44,14 +44,14 @@ function counter_to_verb(counter: CounterName) {
 }
 
 type Counters = {
-  [name in CounterName]: Counter
+    [name in CounterName]: Counter
 };
 
 type Counter = {
-  value: number
-  variance: number | undefined
-  repetitions: number | undefined
-  unit: string
+    value: number
+    variance: number | undefined
+    repetitions: number | undefined
+    unit: string
 };
 
 type Plots = {
@@ -133,10 +133,13 @@ function results_over_time(
         },
     };
 
-    let unzipped: {[level: string]: {x: [], y: number[], error: number[], sha: string[]}} = {};
+    let unzipped: { [level: string]: { x: [], y: number[], error: number[], sha: string[] } } = {};
 
     for (let i in lines) {
         let line = lines[i];
+        if (!line.bench_groups[group]) {
+            continue;
+        }
         for (let run of line.bench_groups[group]) {
             const key = get_key(run.cmd);
 
@@ -365,12 +368,6 @@ function render(data_url: string, entries: Root[], counter: CounterName) {
         const final = entries[entries.length - 1];
         const final_c = final.bench_groups["decompress-c"];
         const final_rs = final.bench_groups["decompress-rs"];
-
-
-    {
-        const final = entries[entries.length - 1];
-        const final_c = final.bench_groups["decompress-c"];
-        const final_rs = final.bench_groups["decompress-rs"];
         const plot = compare_impls_barchart(
             `c versus rs (decompression, ${counter}, on <a href="https://github.com/trifectatechfoundation/libzstd-rs-sys/commit/${final.commit_hash}">main</a>)`,
             "zstd-rs",
@@ -384,30 +381,44 @@ function render(data_url: string, entries: Root[], counter: CounterName) {
         render_plot(plot);
     }
 
-        //        {
-        //            const plot = compare_impls(
-        //                `c versus rs (decompression, ${counter}, on <a href="https://github.com/trifectatechfoundation/libzstd-rs-sys/commit/${final.commit_hash}">main</a>)`,
-        //                "zstd-sys",
-        //                final_c,
-        //                "libzstd-rs-sys",
-        //                final_rs,
-        //                "Input Chunk Size (power of 2 bytes)",
-        //                (cmd) => parseFloat(cmd[2]),
-        //                counter,
-        //                [5, 16],
-        //            );
-        //            render_plot(plot);
-        //        }
-    }
-
     {
-        console.log(entries);
         const plot = results_over_time(
             "libzstd-rs-sys decompression",
             entries,
             "decompress-rs",
             ["silesia-small.tar.zst", "re2-exhaustive.txt.zst", "zip64support.tar.zst"],
             (cmd) => cmd[2],
+            (level) => `${level}`,
+            counter,
+        );
+        render_plot(plot);
+    }
+
+    {
+        const final = entries[entries.length - 1];
+        const final_c = final.bench_groups["compress-c"];
+        const final_rs = final.bench_groups["compress-rs"];
+        const plot = compare_impls_barchart(
+            `c versus rs (compression, ${counter}, on <a href="https://github.com/trifectatechfoundation/libzstd-rs-sys/commit/${final.commit_hash}">main</a>)`,
+            "zstd-rs",
+            final_c,
+            "libzstd-rs-sys",
+            final_rs,
+            "File",
+            (cmd) => `${cmd[3].split("/").reverse()[0]} (level ${cmd[2]})`,
+            counter,
+        );
+        render_plot(plot);
+    }
+
+    {
+        const plot = results_over_time(
+            "libzstd-rs-sys compression",
+            entries,
+            "compress-rs",
+            ["silesia-small.tar.zst", "re2-exhaustive.txt.zst", "zip64support.tar.zst"]
+                .flatMap((f) => [1, 3, 19].map((level) => `${f} (level ${level})`)),
+            (cmd) => `${cmd[3]} (level ${cmd[2]})`,
             (level) => `${level}`,
             counter,
         );
